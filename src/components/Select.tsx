@@ -1,22 +1,19 @@
 import styled from 'styled-components';
 
-export const Input: React.FC<any> = (props) => {
+export const Select: React.FC<any> = (props) => {
   return (
     <Container>
       <Title $isError={props.color}>
         {props.title}
       </Title>
       <Content>
-        <InputStyle
-          onChange={props.onChange}
-          placeholder={props.holder}
-          value={props.value}
-          type={props.type}
-          disabled={props.disabled}
-        />
-        <Unit>
-          {props.unit}
-        </Unit>
+        <InputStyle name="cars" defaultValue={"4"} onChange={props.onChange} id="cars">
+            <option value={1}>WETH</option>
+            <option value={2}>DAI</option>
+            <option value={3}>USDC</option>
+            <option value={4}>USDT</option>
+            <option value={5}>TUSD</option>
+        </InputStyle>
       </Content>
     </Container>
   );
@@ -34,7 +31,7 @@ const Content = styled.div`
 	width: 50%;
 `
 
-const InputStyle = styled.input`
+const InputStyle = styled.select`
 	box-sizing: border-box;
 	border: 1px solid var(--shade-4);
 	border-radius: var(--border-radius);
@@ -48,8 +45,8 @@ const InputStyle = styled.input`
 export const Title = styled.div<{ $isError?: any }>`
 	font-weight: 400;
   font-size: 14px;
+  color: var(--shade-4);
   color: black;
-  // color: var(--shade-4);
 `;
 
 const Unit = styled.div`

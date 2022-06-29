@@ -1,10 +1,14 @@
 import { RouteObject, useRoutes } from 'react-router-dom';
-
+import {NotificationContainer, NotificationManager} from 'react-notifications';
 import {
   Market,
   Collections,
-  Wallet
+  Wallet,
+  Rents,
+  Claim,
+  StopLending
 } from 'pages';
+
 
 const routes: RouteObject[] = [
   {
@@ -13,7 +17,7 @@ const routes: RouteObject[] = [
     children: [],
   },
   {
-    path: "/Market",
+    path: "/Market/:id",
     element: <Market />,
     children: [],
   },
@@ -32,6 +36,21 @@ const routes: RouteObject[] = [
     element: <Wallet />,
     children: [],
   },
+  {
+    path: "/Rents",
+    element: <Rents />,
+    children: [],
+  },
+  {
+    path: "/StopLending",
+    element: <StopLending />,
+    children: [],
+  },
+  {
+    path: "/Claim",
+    element: <Claim />,
+    children: [],
+  }
 ];
 
 const Router: React.FC = () => {
@@ -39,6 +58,7 @@ const Router: React.FC = () => {
   return (
     <>
       {routing}
+      <NotificationContainer/>
     </>
   );
 }

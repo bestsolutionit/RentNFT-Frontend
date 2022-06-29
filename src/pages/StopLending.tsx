@@ -1,38 +1,56 @@
 import styled from 'styled-components';
 import { useMemo, useState ,useEffect } from 'react';
-import { useMoralis, useMoralisWeb3Api  } from 'react-moralis';
+import { useMoralis, useMoralisWeb3Api,useMoralisQuery  } from 'react-moralis';
 import { useParams } from 'react-router-dom';
+import moment from 'moment'
 import { useSelector } from 'react-redux';
 
 import { DefaultCard } from 'components';
 import { Actions } from 'store/types';
 
-const Wallet: React.FC<any> = () => {
+const StopLending: React.FC<any> = () => {
   const id = useParams().id || "";
   const lendData = useSelector((state: any) => state.myNFTs);
   const payBackData = useSelector((state: any) => state.rentNFTs);
-  const [nfts, setNFts] = useState([])
+  const [list, setList] = useState([])
   const data = id === "Lend" ? lendData : payBackData;
   const { authenticate, isAuthenticated, isInitialized, account, chainId, logout } = useMoralis();
   const Web3Api = useMoralisWeb3Api();  
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const userEthNFTs = await Web3Api.account.getNFTs({chain:"rinkeby",address:account}) 
-      console.log("userEthNfts------->",userEthNFTs)
-      setNFts([...userEthNFTs.result])
-      return userEthNFTs;
-    }
-    if(account){
-      const result = fetchData()
-    }
-  }, [account])
+  const { fetch } = useMoralisQuery(
+    "lend_records",
+    (query) =>
+      query.equalTo("status","lend").limit(10),
+    [],
+    { autoFetch: false }
+  );
 
   const refresh = async ()=>{
-    const userEthNFTs = await Web3Api.account.getNFTs({chain:"rinkeby",address:account}) 
-    console.log("userEthNfts------->",userEthNFTs)
-    setNFts([...userEthNFTs.result])
+    setTimeout(async ()=>{
+      const results = await fetch();
+      if(results){
+        const data = results.map((result)=>result.attributes)
+        setList([...data])
+      }
+    },3000)
+    
   }
+
+  useEffect(() => {
+    console.log("hello world.....")
+    const getList = async () => {
+      const results = await fetch();
+      console.log("results in get list----> stop lending-->", results)
+      if(results){
+        const data = results.map((result)=>result.attributes)
+
+        setList([...data])
+      }
+      
+    };
+    getList()
+    
+  }, [account])
 
   return (
     <Container>
@@ -43,26 +61,15 @@ const Wallet: React.FC<any> = () => {
               Please connect to your Wallet.
             </span>
           </Text>}
-        {isAuthenticated && nfts.map((_data: any, index: number) => (
+        {isAuthenticated && list.map((_data: any, index: number) => (
           <DefaultCard
             key={index}
-            // action={id === "Lend" ? Actions.LEND_NFT : Actions.PAYBACK_NFT}
-            onFinish={()=>{
-              refresh()
-            }}
-            action={Actions.LEND_NFT}
+            action={Actions.STOP_LENDING}
             dataIndex={index}
             data={_data}
+            onFinish={()=>{refresh()}}
           />
         ))}
-        {/* {isAuthenticated && data.map((_data: any, index: number) => (
-          <DefaultCard
-            key={index}
-            action={id === "Lend" ? Actions.LEND_NFT : Actions.PAYBACK_NFT}
-            dataIndex={index}
-            data={_data}
-          />
-        ))} */}
       </Content>
     </Container>
   );
@@ -91,4 +98,4 @@ const Text = styled.div`
   min-height: calc(100vh - 70px - 100px - 70px);
 `
 
-export default Wallet;
+export default StopLending;
